@@ -1,4 +1,4 @@
-constexpr int SAMPLES {5000ul};
+constexpr int SAMPLES {16000ul};
 
 #include <iostream>
 #include <stdlib.h>
@@ -48,7 +48,7 @@ int main()
 	vector<plan_stats> all_stats_no_net;
 
 	//Loading the Network
-	torch::jit::script::Module mod = torch::jit::load("/home/raghav/Raghav/Research/xyt_domain/ML_model2/trained_networks/cpp_model360_8.pt");
+	torch::jit::script::Module mod = torch::jit::load("../../ML_model2/trained_networks/cpp_model360_8_n.pt");
 	random_device rnd;
 	mt19937 mt(rnd());
 	vector<node> plan_net;
@@ -88,7 +88,7 @@ int main()
 
 	precompute_map(states, map_ptr, mod, reed_map, goal, tree_data, precom_samp);
 	//valid_prim_data(map_ptr,reed_map,goal);
-	predict_prim_data(map_ptr,mod,reed_map,goal,tree_data);
+	predict_prim_data(map_ptr,mod,reed_map,goal);
 	//no_net_precomp(states,map_ptr,reed_map,goal,tree_data, precom_samp);
 	clock_t begin = clock();
 	KDtree<float, precom_samp, 3> kdtree(&tree_data);

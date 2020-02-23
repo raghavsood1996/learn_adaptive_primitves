@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import cv2
 
 
-invalid_file = open("../stats/invalid_states.txt",'r')
+invalid_file = open("../stats/predicted_invalid_states.txt",'r')
 env_file = open("../custom_maps/env6.txt")
 
 env_list = []
@@ -39,7 +39,7 @@ for line in invalid_file:
 
 
 
-valid_file = open("../stats/valid_states.txt",'r')
+valid_file = open("../stats/predicted_valid_states.txt",'r')
 
 x_valid= []
 y_valid = []

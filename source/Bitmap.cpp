@@ -381,7 +381,7 @@ torch::Tensor CharBitmap::ray_tracing_2(config curr_pos, int front_sweep_angle, 
 	double range_step = 1;
 	int j = 1;
 	
-	#pragma omp parallel for
+	//#pragma omp parallel for
 	for (int angle = 0; angle < front_sweep_angle; angle += front_step)
 	{
 
@@ -409,6 +409,7 @@ torch::Tensor CharBitmap::ray_tracing_2(config curr_pos, int front_sweep_angle, 
 	}
 
 	// cout << "new ray time is" << float(clock() - begin )/ CLOCKS_PER_SEC << endl;
+	//cout<<"in tracing"<<"\n";
 	return min_dist;
 }
 

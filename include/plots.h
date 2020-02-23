@@ -55,10 +55,9 @@ void valid_prim_data(CharBitmap *map, unordered_map<config, bool, confighasher, 
 }
 
 
-void predict_prim_data(CharBitmap *map, torch::jit::script::Module &mod, unordered_map<config, bool, confighasher, configComparator> &reed_map, node goal,
-					array<array<float, 3>, SAMPLES> &tree_data)
+void predict_prim_data(CharBitmap *map, torch::jit::script::Module &mod, unordered_map<config, bool, confighasher, configComparator> &reed_map, node goal)
 {	
-	std::vector<torch::Tensor> inputs(16000); //all network inputs stacked
+	std::vector<torch::Tensor> inputs; //all network inputs stacked
 	std::vector<torch::jit::IValue> final_inputs;
 	std::vector<config> pre_configs;
 	int num_rays = 360;
@@ -73,15 +72,13 @@ void predict_prim_data(CharBitmap *map, torch::jit::script::Module &mod, unorder
 
 	for(int i=0; i<400; i++){
         for(int j=0; j<400; j++){
-            config temp(j,i,0);
+            config temp(j,i,90);
 			pre_configs.push_back(temp);
-			tree_data[states] = {temp.x, temp.y, deg2rad(temp.theta)};
 			
-			//torch::Tensor obst_distances = map->dist_nearest_obst(temp, num_rays, step); //generating the feature vector from ray tracing
 			torch::Tensor obst_distances2 = map->ray_tracing_2(temp, 360,8,0,8);
 			obst_distances2[0][num_rays / step] = goal.theta - temp.theta;
 			obst_distances2[0][(num_rays / step) + 1] = distance(temp.x, temp.y, goal.x, goal.y);
-			inputs[states]= obst_distances2;
+			inputs.push_back(obst_distances2);
 			states++;
 			cout<<states<<"\n";
 			

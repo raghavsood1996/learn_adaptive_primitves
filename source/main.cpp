@@ -1,4 +1,4 @@
-constexpr int SAMPLES {16000ul};
+constexpr int SAMPLES {5000ul};
 
 #include <iostream>
 #include <stdlib.h>
@@ -29,10 +29,10 @@ int main()
 	thegraph->set_motion_prims();
 
 	node start(295,268,270);  //Start pose for the vehicle
-	node goal(200,200,0); //Goal pose for the vehicle
+	node goal(300,300,0); //Goal pose for the vehicle
 
 	int w, h, key;
-	bool terminate = false;
+	bool terminate = true;
 
 	w = 400;
 	h = 400;
@@ -48,7 +48,7 @@ int main()
 	vector<plan_stats> all_stats_no_net;
 
 	//Loading the Network
-	torch::jit::script::Module mod = torch::jit::load("../../ML_model2/trained_networks/cpp_model360_8_n.pt");
+	torch::jit::script::Module mod = torch::jit::load("../prediction_model/trained_model/cpp_model360_8_fg_cs.pt");
 	random_device rnd;
 	mt19937 mt(rnd());
 	vector<node> plan_net;
@@ -64,7 +64,7 @@ int main()
 	plan_stats *curr_stat_no_net = new plan_stats;
 
 	//filename = "../maps/map"+to_string(rnd_map_id)+".txt";
-	filename = "../custom_maps/env"+to_string(6)+".txt";
+	filename = "../custom_maps/env"+to_string(4)+".txt";
 
 
 	cout << "Environment " << filename << endl;
@@ -85,10 +85,10 @@ int main()
 	}
 
 	heuristic_planner(states, map_ptr, goal); //The planner that calculates heuristics using a backward Djiktras search
-
-	precompute_map(states, map_ptr, mod, reed_map, goal, tree_data, precom_samp);
+	biased_sampling_precomp(states, map_ptr, mod, reed_map, goal, tree_data, precom_samp);
+	// precompute_map(states, map_ptr, mod, reed_map, goal, tree_data, precom_samp);
 	//valid_prim_data(map_ptr,reed_map,goal);
-	predict_prim_data(map_ptr,mod,reed_map,goal);
+	// predict_prim_data(map_ptr,mod,reed_map,goal);
 	//no_net_precomp(states,map_ptr,reed_map,goal,tree_data, precom_samp);
 	clock_t begin = clock();
 	KDtree<float, precom_samp, 3> kdtree(&tree_data);
@@ -111,7 +111,7 @@ int main()
 	{
 		average_plan_time_net += stat.planning_time;
 		if (stat.planning_time > max_plan_time_net)
-		{
+	{
 			max_plan_time_net = stat.planning_time;
 		}
 		average_cost_net += stat.plan_cost;

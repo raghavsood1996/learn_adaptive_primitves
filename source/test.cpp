@@ -1,3 +1,4 @@
+constexpr int SAMPLES {5000ul};
 #include <iostream>
 #include <stdlib.h>
 #include <string>
@@ -17,7 +18,7 @@
 
 using namespace std;
 
-int test()
+int main()
 {
 	CharBitmap bitu; // the cost map
 	CharBitmap *map_ptr;
@@ -32,7 +33,7 @@ int test()
 	node goal;
 
 	int w, h, key;
-	bool terminate = false;
+	bool terminate = true;
 
 	w = 400;
 	h = 400;
@@ -48,7 +49,7 @@ int test()
 	vector<plan_stats> all_stats_no_net;
 
 	//Loading the Network
-	torch::jit::script::Module mod = torch::jit::load("/home/raghav/Raghav/Research/xyt_domain/ML_model2/trained_networks/cpp_model360_8.pt"); 
+	torch::jit::script::Module mod = torch::jit::load("../prediction_model/trained_model/cpp_model360_8.pt"); 
 	random_device rnd;
 	mt19937 mt(rnd());
 	vector<node> plan_net;
@@ -62,8 +63,8 @@ int test()
 	for (query q : rand_queries /*int i=0; i<5; i++*/)
 	{
 		unordered_map<config, bool, confighasher, configComparator> reed_map; //map that stores the output from net
-		const int precom_samp = 5000;										  //number of samples to precompute for
-		array<array<float, 3>, precom_samp> tree_data;
+											  //number of samples to precompute for
+		array<array<float, 3>, SAMPLES> tree_data;
 		int rnd_map_id = map_idx();
 		plan_stats *curr_stat_net = new plan_stats;
 		plan_stats *curr_stat_no_net = new plan_stats;
@@ -92,18 +93,17 @@ int test()
 		
 		
 		heuristic_planner(states, map_ptr, goal); //The planner that calculates heuristics using a backward Djiktras search
-
-		precompute_map(states, map_ptr, mod, reed_map, goal, tree_data, precom_samp);
+		biased_sampling_precomp(states, map_ptr, mod, reed_map, goal, tree_data, SAMPLES);
+		// precompute_map(states, map_ptr, mod, reed_map, goal, tree_data, SAMPLES);
 		//no_net_precomp(states,map_ptr,reed_map,goal,tree_data, precom_samp);
 		clock_t begin = clock();
-		KDtree<float, precom_samp, 3> kdtree(&tree_data);
+		KDtree<float, SAMPLES, 3> kdtree(&tree_data);
 		cout << "Kd tree precompute time " << ((float(clock() - begin)) / CLOCKS_PER_SEC) << endl;
 
 		plan_net = planner(states, map_ptr, thegraph, start, goal, curr_stat_net, reed_map, kdtree, tree_data, false);
 		all_stats_net.push_back(*curr_stat_net);
 
 		// if(curr_stat_net->plan_cost != 0){
-
 		// 	out_file << to_string(rnd_map_id)+"\n";
 		// 	out_file << start.toString()+"\n";
 		// 	out_file << goal.toString()+"\n";

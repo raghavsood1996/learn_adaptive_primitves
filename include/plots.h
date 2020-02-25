@@ -27,7 +27,7 @@ void valid_prim_data(CharBitmap *map, unordered_map<config, bool, confighasher, 
 	for (int i = 0; i < states; i++)
 	{
 		double curr[] = {pre_configs[config_count].x, pre_configs[config_count].y, pre_configs[config_count].theta* 3.142 / 180.0};
-		double goal[] = {goal_node.x, goal_node.y, goal_node.theta * 3.142 / 180.0};
+		double goal[] = {double(goal_node.x), double(goal_node.y), goal_node.theta * 3.142 / 180.0};
 		double turning_radius = 22.0;
 		ReedsSheppStateSpace space(turning_radius);
 		vector<config> path_samples;
@@ -72,7 +72,7 @@ void predict_prim_data(CharBitmap *map, torch::jit::script::Module &mod, unorder
 
 	for(int i=0; i<400; i++){
         for(int j=0; j<400; j++){
-            config temp(j,i,90);
+            config temp(j,i,270);
 			pre_configs.push_back(temp);
 			
 			torch::Tensor obst_distances2 = map->ray_tracing_2(temp, 360,8,0,8);
@@ -80,7 +80,7 @@ void predict_prim_data(CharBitmap *map, torch::jit::script::Module &mod, unorder
 			obst_distances2[0][(num_rays / step) + 1] = distance(temp.x, temp.y, goal.x, goal.y);
 			inputs.push_back(obst_distances2);
 			states++;
-			cout<<states<<"\n";
+			// cout<<states<<"\n";
 			
         }
 		

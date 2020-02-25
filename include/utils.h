@@ -123,6 +123,57 @@ config sample_config_hval(state2d **states, int max_hval, node &goal, int fixed_
 	return sample_config;
 }
 
+
+config sample_random_local(config curr, int radius){
+	random_device rnd;
+	mt19937 mt(rnd());
+	mt19937 mt2(rnd());
+	int heading[] = {0, 45, 90, 135, 180, 225, 270, 315};
+	uniform_int_distribution<int> heading_idx_dist(0, 7);
+	int min_x, max_x, min_y, max_y;
+
+	if(curr.x + radius < 390){
+		max_x = curr.x + radius;
+	}
+	else{
+		max_x = 390;
+	}
+
+	if(curr.y + radius < 390){
+		max_y = curr.y + radius;
+	}
+	else{
+		max_y = 390;
+	}
+
+	if(curr.x - radius>11){
+		min_x = curr.x - radius;
+	}
+	else{
+		min_x = 11;
+	}
+
+	if(curr.y - radius > 11){
+		min_y = curr.y - radius;
+	}
+	else{
+		min_y = 11;
+	}
+	
+	uniform_int_distribution<int> x_idx_dist(min_x, max_x);
+	uniform_int_distribution<int> y_idx_dist(min_y, max_y);
+	auto x_idx = bind(x_idx_dist, mt);
+	auto y_idx = bind(y_idx_dist, mt2);
+	auto heading_idx = bind(heading_idx_dist, mt);
+	config sample_config;
+
+	
+	
+	sample_config = config(x_idx(), y_idx(), heading[heading_idx()]);
+	
+
+	return sample_config;
+}
 node sample_random_node()
 {
 	random_device rnd;
@@ -211,7 +262,128 @@ void no_net_precomp(state2d **state, CharBitmap *map, unordered_map<config, bool
 	cout << "precompute time " << t_time << endl;
 }
 
+void biased_sampling_precomp(state2d **state, CharBitmap *map, torch::jit::script::Module &mod, unordered_map<config, bool, confighasher, configComparator> &reed_map, node goal,
+					array<array<float, 3>, SAMPLES> &tree_data, int num_states){
+	std::vector<torch::Tensor> inputs; //all network inputs stacked
+	std::vector<torch::jit::IValue> final_inputs;
+	std::vector<config> pre_configs;
+	int num_rays = 360;
+	int step = 8;
+	double t_time = 0;
+	int states = 0;
+	using clock = std::chrono::system_clock;
+	using ms = std::chrono::duration<double, std::milli>;
+	int fix_init_samp = 1000;
+	while(states < fix_init_samp){
+		config temp;
+		
+		temp = sample_random_config(); //sampling a random config
+		if (!map->isFree(temp.x, temp.y)) continue;
+		pre_configs.push_back(temp);
+		tree_data[states] = {temp.x, temp.y, deg2rad(temp.theta)};
+		
+		//torch::Tensor obst_distances = map->dist_nearest_obst(temp, num_rays, step); //generating the feature vector from ray tracing
+		torch::Tensor obst_distances2 = map->ray_tracing_2(temp, 360,8,0,8);
+		obst_distances2[0][num_rays / step] = goal.theta - temp.theta;
+		obst_distances2[0][(num_rays / step) + 1] = distance(temp.x, temp.y, goal.x, goal.y);
+		inputs.push_back(obst_distances2);
+		
+		
+		states++;
+	}					
 
+	at::Tensor comb_input = torch::cat(inputs); //concatenating all the input tensors in a batch
+	final_inputs.push_back(comb_input); // the final input to the network
+	const auto before = clock::now();
+	at::Tensor output = mod.forward(final_inputs).toTensor(); //inference
+	const ms duration = clock::now() - before;
+	cout << "forward pass precompute time for "<<SAMPLES<<" samples " << duration.count()<<" ms" << endl;
+
+	
+	int config_count = 0;
+	
+	
+	for (int i = 0; i < states; i++)
+	{
+
+		if (output[i].item<float_t>() > 0.5)
+		{
+			reed_map[pre_configs[config_count]] = 1;
+		}
+		else
+		{
+			reed_map[pre_configs[config_count]] = 0;
+		}
+		config_count++;
+	}
+
+
+
+	while(states < num_states){
+		for(auto i = reed_map.begin(); i != reed_map.end(); i++){
+			auto sam_conf = i->first;
+			if(!i->second){
+				continue;
+			}
+
+			for(int j=0;j< 4; j++){
+				config temp = sample_random_local(sam_conf,60);
+
+				if (!map->isFree(temp.x, temp.y)) continue;
+				pre_configs.push_back(temp);
+				// cout<<"done second"<<"\n";
+				// cout<<states<<"\n";
+				tree_data[states] = {temp.x, temp.y, deg2rad(temp.theta)};
+				
+				torch::Tensor obst_distances2 = map->ray_tracing_2(temp, 360,8,0,8);
+				obst_distances2[0][num_rays / step] = goal.theta - temp.theta;
+				obst_distances2[0][(num_rays / step) + 1] = distance(temp.x, temp.y, goal.x, goal.y);
+				inputs.push_back(obst_distances2);
+		
+		
+				states++;
+				if(states > SAMPLES){
+				break;
+			}
+			}
+
+			if(states > SAMPLES){
+				break;
+			}
+
+
+		}
+	}
+
+
+	comb_input = torch::cat(inputs); //concatenating all the input tensors in a batch
+	final_inputs.clear();
+	final_inputs.push_back(comb_input); // the final input to the network
+	
+	output = mod.forward(final_inputs).toTensor(); //inference
+	// const ms duration = clock::now() - before;
+	// cout << "forward pass precompute time for "<<SAMPLES<<" samples " << duration.count()<<" ms" << endl;
+
+	
+	config_count = 0;
+	
+	
+	for (int i = 0; i < states; i++)
+	{
+
+		if (output[i].item<float_t>() > 0.5)
+		{
+			reed_map[pre_configs[config_count]] = 1;
+		}
+		else
+		{
+			reed_map[pre_configs[config_count]] = 0;
+		}
+		config_count++;
+	}
+
+					
+}
 //precompute the map using neural network
 void precompute_map(state2d **state, CharBitmap *map, torch::jit::script::Module &mod, unordered_map<config, bool, confighasher, configComparator> &reed_map, node goal,
 					array<array<float, 3>, SAMPLES> &tree_data, int num_states)
@@ -225,12 +397,12 @@ void precompute_map(state2d **state, CharBitmap *map, torch::jit::script::Module
 	int states = 0;
 	using clock = std::chrono::system_clock;
 	using ms = std::chrono::duration<double, std::milli>;
-	const auto before = clock::now();
+	
 	while (states < num_states)
 	{
 		
 		config temp;
-		if (states < 2000) //sampling in a config environment
+		if (states < 4000) //sampling in a config environment
 		{
 			temp = sample_random_config(); //sampling a random config
 			if (!map->isFree(temp.x, temp.y)) continue;
@@ -256,8 +428,11 @@ void precompute_map(state2d **state, CharBitmap *map, torch::jit::script::Module
 	
 	at::Tensor comb_input = torch::cat(inputs); //concatenating all the input tensors in a batch
 	final_inputs.push_back(comb_input); // the final input to the network
-
+	const auto before = clock::now();
 	at::Tensor output = mod.forward(final_inputs).toTensor(); //inference
+	const ms duration = clock::now() - before;
+	cout << "forward pass precompute time for "<<SAMPLES<<" samples " << duration.count()<<" ms" << endl;
+
 	
 	int config_count = 0;
 	
@@ -276,9 +451,7 @@ void precompute_map(state2d **state, CharBitmap *map, torch::jit::script::Module
 		config_count++;
 	}
 
-	const ms duration = clock::now() - before;
-	cout << "forward pass precompute time " << duration.count()<<" ms" << endl;
-
+	
 	
 }
 
@@ -373,8 +546,8 @@ std::vector<config> *DrawPath(std::vector<node> plan, CharBitmap *map)
 		else
 		{
 
-			double curr[] = {plan[i].x, plan[i].y, plan[i].theta * 3.14 / 180};
-			double goal[] = {plan[i + 1].x, plan[i + 1].y, plan[i + 1].theta * 3.14 / 180};
+			double curr[] = {double(plan[i].x), double(plan[i].y), plan[i].theta * 3.14 / 180};
+			double goal[] = {double(plan[i + 1].x),double( plan[i + 1].y), plan[i + 1].theta * 3.14 / 180};
 
 			std::vector<config> scaled_path;
 

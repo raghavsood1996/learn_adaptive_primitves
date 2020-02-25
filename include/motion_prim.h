@@ -9,7 +9,7 @@
 #include "col_model.h"
 #include "KDtree.hpp"
 
-#define INT_MAX 100000
+// #define INT_MAX 100000
 using namespace std;
 
 
@@ -573,7 +573,7 @@ public:
 			curr_heading = curr_heading - 360;
 		}
 
-		for (int dir = 0; dir <= 4; dir++)
+		for (int dir = 0; dir <= 4 ; dir++)
 		{
 
 			if (!collision_check(currx, curry, map, dir, curr_heading))
@@ -597,10 +597,12 @@ public:
 
 			//activate Reeds Shepp path when you are a certain distance away from the goal
             
-			if (!use_net && dir == 4)
+			if (!use_net && dir == 4 /*&& states[currx][curry].gval <= 100*/)
 			{
 				//clock_t begin = clock();
-
+				// using clock = std::chrono::system_clock;
+				// using ms = std::chrono::duration<double, std::milli>;
+				// const auto before = clock::now();
 				double curr[] = {currx, curry, curr_heading * 3.142 / 180.0};
 				double goal[] = {goal_node.x, goal_node.y, goal_node.theta * 3.142 / 180.0};
 				double turning_radius = 22.0;
@@ -618,6 +620,8 @@ public:
 					//cout<<"reed sheep length "<<space.distance(curr,goal)<<endl;
 					succesors.push_back(goal_node);
 				}
+				// const ms duration = clock::now() - before;
+				// cout << "Validation time time for "<<SAMPLES<<" samples " << duration.count()<<" ms" << endl;
 			}
 
 			else if(use_net && dir == 4){

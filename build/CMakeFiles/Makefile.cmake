@@ -11,10 +11,6 @@ set(CMAKE_MAKEFILE_DEPENDS
   "CMakeFiles/3.15.3/CMakeCCompiler.cmake"
   "CMakeFiles/3.15.3/CMakeCXXCompiler.cmake"
   "CMakeFiles/3.15.3/CMakeSystem.cmake"
-  "CMakeFiles/FindOpenMP/OpenMPCheckVersion.c"
-  "CMakeFiles/FindOpenMP/OpenMPCheckVersion.cpp"
-  "CMakeFiles/FindOpenMP/OpenMPTryFlag.c"
-  "CMakeFiles/FindOpenMP/OpenMPTryFlag.cpp"
   "/home/raghav/libtorch/share/cmake/Caffe2/Caffe2Config.cmake"
   "/home/raghav/libtorch/share/cmake/Caffe2/Caffe2ConfigVersion.cmake"
   "/home/raghav/libtorch/share/cmake/Caffe2/Caffe2Targets-release.cmake"
@@ -71,4 +67,5 @@ set(CMAKE_MAKEFILE_PRODUCTS
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
   "CMakeFiles/main.dir/DependInfo.cmake"
+  "CMakeFiles/test.dir/DependInfo.cmake"
   )

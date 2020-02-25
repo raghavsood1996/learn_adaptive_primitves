@@ -123,6 +123,19 @@ main/fast:
 	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/build
 .PHONY : main/fast
 
+#=============================================================================
+# Target rules for targets named test
+
+# Build rule for target.
+test: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 test
+.PHONY : test
+
+# fast build rule for target.
+test/fast:
+	$(MAKE) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/build
+.PHONY : test/fast
+
 source/Bitmap.o: source/Bitmap.cpp.o
 
 .PHONY : source/Bitmap.o
@@ -130,6 +143,7 @@ source/Bitmap.o: source/Bitmap.cpp.o
 # target to build an object file
 source/Bitmap.cpp.o:
 	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/source/Bitmap.cpp.o
+	$(MAKE) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/source/Bitmap.cpp.o
 .PHONY : source/Bitmap.cpp.o
 
 source/Bitmap.i: source/Bitmap.cpp.i
@@ -139,6 +153,7 @@ source/Bitmap.i: source/Bitmap.cpp.i
 # target to preprocess a source file
 source/Bitmap.cpp.i:
 	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/source/Bitmap.cpp.i
+	$(MAKE) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/source/Bitmap.cpp.i
 .PHONY : source/Bitmap.cpp.i
 
 source/Bitmap.s: source/Bitmap.cpp.s
@@ -148,6 +163,7 @@ source/Bitmap.s: source/Bitmap.cpp.s
 # target to generate assembly for a file
 source/Bitmap.cpp.s:
 	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/source/Bitmap.cpp.s
+	$(MAKE) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/source/Bitmap.cpp.s
 .PHONY : source/Bitmap.cpp.s
 
 source/fsglxkeymap.o: source/fsglxkeymap.cpp.o
@@ -157,6 +173,7 @@ source/fsglxkeymap.o: source/fsglxkeymap.cpp.o
 # target to build an object file
 source/fsglxkeymap.cpp.o:
 	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/source/fsglxkeymap.cpp.o
+	$(MAKE) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/source/fsglxkeymap.cpp.o
 .PHONY : source/fsglxkeymap.cpp.o
 
 source/fsglxkeymap.i: source/fsglxkeymap.cpp.i
@@ -166,6 +183,7 @@ source/fsglxkeymap.i: source/fsglxkeymap.cpp.i
 # target to preprocess a source file
 source/fsglxkeymap.cpp.i:
 	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/source/fsglxkeymap.cpp.i
+	$(MAKE) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/source/fsglxkeymap.cpp.i
 .PHONY : source/fsglxkeymap.cpp.i
 
 source/fsglxkeymap.s: source/fsglxkeymap.cpp.s
@@ -175,6 +193,7 @@ source/fsglxkeymap.s: source/fsglxkeymap.cpp.s
 # target to generate assembly for a file
 source/fsglxkeymap.cpp.s:
 	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/source/fsglxkeymap.cpp.s
+	$(MAKE) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/source/fsglxkeymap.cpp.s
 .PHONY : source/fsglxkeymap.cpp.s
 
 source/fsglxwrapper.o: source/fsglxwrapper.cpp.o
@@ -184,6 +203,7 @@ source/fsglxwrapper.o: source/fsglxwrapper.cpp.o
 # target to build an object file
 source/fsglxwrapper.cpp.o:
 	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/source/fsglxwrapper.cpp.o
+	$(MAKE) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/source/fsglxwrapper.cpp.o
 .PHONY : source/fsglxwrapper.cpp.o
 
 source/fsglxwrapper.i: source/fsglxwrapper.cpp.i
@@ -193,6 +213,7 @@ source/fsglxwrapper.i: source/fsglxwrapper.cpp.i
 # target to preprocess a source file
 source/fsglxwrapper.cpp.i:
 	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/source/fsglxwrapper.cpp.i
+	$(MAKE) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/source/fsglxwrapper.cpp.i
 .PHONY : source/fsglxwrapper.cpp.i
 
 source/fsglxwrapper.s: source/fsglxwrapper.cpp.s
@@ -202,6 +223,7 @@ source/fsglxwrapper.s: source/fsglxwrapper.cpp.s
 # target to generate assembly for a file
 source/fsglxwrapper.cpp.s:
 	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/source/fsglxwrapper.cpp.s
+	$(MAKE) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/source/fsglxwrapper.cpp.s
 .PHONY : source/fsglxwrapper.cpp.s
 
 source/main.o: source/main.cpp.o
@@ -238,6 +260,7 @@ source/reeds_shepp.o: source/reeds_shepp.cpp.o
 # target to build an object file
 source/reeds_shepp.cpp.o:
 	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/source/reeds_shepp.cpp.o
+	$(MAKE) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/source/reeds_shepp.cpp.o
 .PHONY : source/reeds_shepp.cpp.o
 
 source/reeds_shepp.i: source/reeds_shepp.cpp.i
@@ -247,6 +270,7 @@ source/reeds_shepp.i: source/reeds_shepp.cpp.i
 # target to preprocess a source file
 source/reeds_shepp.cpp.i:
 	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/source/reeds_shepp.cpp.i
+	$(MAKE) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/source/reeds_shepp.cpp.i
 .PHONY : source/reeds_shepp.cpp.i
 
 source/reeds_shepp.s: source/reeds_shepp.cpp.s
@@ -256,7 +280,35 @@ source/reeds_shepp.s: source/reeds_shepp.cpp.s
 # target to generate assembly for a file
 source/reeds_shepp.cpp.s:
 	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/source/reeds_shepp.cpp.s
+	$(MAKE) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/source/reeds_shepp.cpp.s
 .PHONY : source/reeds_shepp.cpp.s
+
+source/test.o: source/test.cpp.o
+
+.PHONY : source/test.o
+
+# target to build an object file
+source/test.cpp.o:
+	$(MAKE) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/source/test.cpp.o
+.PHONY : source/test.cpp.o
+
+source/test.i: source/test.cpp.i
+
+.PHONY : source/test.i
+
+# target to preprocess a source file
+source/test.cpp.i:
+	$(MAKE) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/source/test.cpp.i
+.PHONY : source/test.cpp.i
+
+source/test.s: source/test.cpp.s
+
+.PHONY : source/test.s
+
+# target to generate assembly for a file
+source/test.cpp.s:
+	$(MAKE) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/source/test.cpp.s
+.PHONY : source/test.cpp.s
 
 # Help Target
 help:
@@ -267,6 +319,7 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
 	@echo "... main"
+	@echo "... test"
 	@echo "... source/Bitmap.o"
 	@echo "... source/Bitmap.i"
 	@echo "... source/Bitmap.s"
@@ -282,6 +335,9 @@ help:
 	@echo "... source/reeds_shepp.o"
 	@echo "... source/reeds_shepp.i"
 	@echo "... source/reeds_shepp.s"
+	@echo "... source/test.o"
+	@echo "... source/test.i"
+	@echo "... source/test.s"
 .PHONY : help
 
 
